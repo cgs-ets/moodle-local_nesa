@@ -1,0 +1,7 @@
+button.nesa-number.btn.btn-link.btn-icon.icon-size-3.cellmenubtn {
+  cursor: none;
+}
+
+button.nesa-number.btn.btn-link.btn-icon.icon-size-3.cellmenubtn:hover {
+  pointer-events: none !important;
+}

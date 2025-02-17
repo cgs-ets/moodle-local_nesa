@@ -32,8 +32,6 @@ define(['jquery'], function ($) {
         nesanumbers = JSON.parse(nesanumbers);
 
         if (table.length) {
-          // Wait for the table to load and then insert the NESA column
-          // function () {
           // Find the heading row (tr class="heading")
           var headingRow = table.find('tr.heading');
 
@@ -49,23 +47,25 @@ define(['jquery'], function ($) {
             )
             .append(
               $('<button>')
-                .addClass('btn btn-link btn-icon icon-size-3 cellmenubtn')
+                .addClass(
+                  'nesa-number btn btn-link btn-icon icon-size-3 cellmenubtn', //btn btn-link btn-icon icon-size-3 cellmenubtn
+                )
                 .attr({
                   type: 'button',
                   'data-toggle': 'dropdown',
                   'aria-haspopup': 'true',
                   'aria-expanded': 'false',
-                  'data-type': 'studiescode', // Changed from 'username' to 'studiescode'
-                  'data-id': 'studiescode', // Changed from 'username' to 'studiescode'
-                })
-                .css('color', '#F8F9FA') // Set the button's color to #F8F9FA
-                .append(
-                  $('<i>')
-                    .addClass('icon fa fa-ellipsis-h fa-fw m-0')
-                    .attr('title', 'Cell actions')
-                    .attr('aria-hidden', 'true'),
-                )
-                .append($('<span>').addClass('sr-only').text('Cell actions')),
+                  'data-type': 'studiescode',
+                  'data-id': 'studiescode',
+                }),
+              // .css('color', '#F8F9FA') // Set the button's color to #F8F9FA
+              // .append(
+              //   $('<i>')
+              //     .addClass('icon fa fa-ellipsis-h fa-fw m-0')
+              //     .attr('title', 'Cell actions')
+              //     .attr('aria-hidden', 'true'),
+              // )
+              // .append($('<span>').addClass('sr-only').text('Cell actions')),
             )
             .addClass('userfield studiescode cell c' + emailIndex)
             .attr({
@@ -146,11 +146,15 @@ define(['jquery'], function ($) {
 
           topLeftCell.attr('colspan', userfieldCount + 1); // +1 because the firstname/lastname doesnt have theusefield class
 
-          var lastRow = table.find('tr.avg.r0.lastrow.pinned');
+          // Update the colspan for rows after the last userrow
+          var lastUserRow = table.find('tr.userrow').last();
+          var rowsAfterUserRow = lastUserRow.nextAll(); // Get all rows after the last userrow
 
-          var lastRowCell = lastRow.find('th.header.range.cell.c0');
-
-          lastRowCell.attr('colspan', userfieldCount + 1);
+          // Loop through each of those rows and update the colspan of the th elements
+          rowsAfterUserRow.each(function () {
+            var thElement = $(this).find('th');
+            thElement.attr('colspan', userfieldCount + 1);
+          });
         }
       });
     },
