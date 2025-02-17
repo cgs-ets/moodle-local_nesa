@@ -25,8 +25,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 
-// Function to hook into the page navigation for Grader Report
-// lib.php
 
 function local_nesa_extend_navigation(navigation_node $navigation) {
     global $PAGE, $COURSE;
