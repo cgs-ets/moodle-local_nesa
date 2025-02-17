@@ -1,0 +1,17 @@
+# NESA Plugin for Moodle
+
+## Description
+The NESA plugin adds the NESA number in the graders table.
+
+## Installation
+1. Download the plugin from the Moodle plugins directory or clone the repository.
+2. Place the `nesa` folder in the `local` directory of your Moodle installation.
+3. Navigate to the Site Administration > Notifications to complete the installation.
+
+## Usage
+After installation, you will see the NESA number in the grader table.
+
+
+## License ##
+
+2025 Veronica Bermegui
