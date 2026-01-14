@@ -166,19 +166,20 @@ let studiesCodeSortAsc = true;
  * Sort the submissions table by Studies Code column.
  *
  * @param {HTMLTableElement} table - The table element
- * @param {number} columnIndex - The index of the Studies Code column
  */
-const sortTableByStudiesCode = (table, columnIndex) => {
+const sortTableByStudiesCode = (table) => {
     const tbody = table.querySelector('tbody');
     if (!tbody) {
         return;
     }
 
-    const rows = Array.from(tbody.querySelectorAll('tr'));
+    // Only select direct children tr of tbody, not nested tr inside file submission tables
+    const allRows = Array.from(tbody.querySelectorAll(':scope > tr'));
 
-    rows.sort((a, b) => {
-        const cellA = a.querySelectorAll('td')[columnIndex];
-        const cellB = b.querySelectorAll('td')[columnIndex];
+    // Sort rows by the Studies Code value
+    allRows.sort((a, b) => {
+        const cellA = a.querySelector('td.studiescode');
+        const cellB = b.querySelector('td.studiescode');
 
         const valueA = cellA ? cellA.textContent.trim() : '';
         const valueB = cellB ? cellB.textContent.trim() : '';
@@ -197,7 +198,9 @@ const sortTableByStudiesCode = (table, columnIndex) => {
     });
 
     // Re-append rows in sorted order
-    rows.forEach(row => tbody.appendChild(row));
+    allRows.forEach((row) => {
+        tbody.appendChild(row);
+    });
 
     // Toggle sort direction for next click
     studiesCodeSortAsc = !studiesCodeSortAsc;
@@ -285,7 +288,7 @@ const setStudiesCodeForSubmissionsTable = (nesanumbers) => {
             redirectToShowAllAndSort();
         } else {
             // Already showing all, sort directly
-            sortTableByStudiesCode(table, emailIndex);
+            sortTableByStudiesCode(table);
             // Update sort icon
             sortIcon.innerHTML = studiesCodeSortAsc ? ' ↓' : ' ↑';
         }
@@ -358,7 +361,7 @@ const setStudiesCodeForSubmissionsTable = (nesanumbers) => {
         window.history.replaceState({}, '', url.toString());
 
         // Trigger sort
-        sortTableByStudiesCode(table, emailIndex);
+        sortTableByStudiesCode(table);
         sortIcon.innerHTML = studiesCodeSortAsc ? ' ↓' : ' ↑';
     }
 };
