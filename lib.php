@@ -15,7 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Plugin functions for the repository_pluginname plugin.
+ * Plugin functions for the local_nesa plugin.
+ * This plugin initially added NESA codes (HSC) to the grader report
+ * 
  *
  * @package   local_nesa
  * @copyright 2025, Veronica Bermegui <>
@@ -28,19 +30,17 @@ defined('MOODLE_INTERNAL') || die();
 
 function local_nesa_extend_navigation(navigation_node $navigation) {
     global $PAGE, $COURSE;
-
+    
     // Check if we're on the Grader Report page
-    if ($PAGE->pagetype === 'grade-report-grader-index') {
-
-        // local_nesa_clear_cache($COURSE->id);
+    if ($PAGE->pagetype === 'grade-report-grader-index' || $PAGE->pagetype === 'mod-assign-grading') {
         $nesanumbers =  local_nesa_get_students_nesa_numbers($COURSE->id);
-
         $PAGE->requires->js_call_amd('local_nesa/control', 'init',[json_encode($nesanumbers)]);
-
     }
+
+    
 }
 
-// Function to retrieve students' NESA numbers, with caching
+// Function to retrieve students' NESA/IB numbers, with caching
 function local_nesa_get_students_nesa_numbers($courseid) {
     global $DB, $CACHE;
 
@@ -55,14 +55,13 @@ function local_nesa_get_students_nesa_numbers($courseid) {
 
     // If no cached data, fetch the data from the database
     $sql = "SELECT u.id, u.username,
-            ISNULL(uid.data, 'N/A') AS studies_code
+            COALESCE(uid.data, 'N/A') AS studies_code
             FROM {user} u
             JOIN {user_enrolments} ue ON ue.userid = u.id
             JOIN {enrol} e ON e.id = ue.enrolid
             LEFT JOIN {user_info_data} uid ON uid.userid = u.id
-            LEFT JOIN {user_info_field} uif ON uif.id = uid.fieldid
-            WHERE e.courseid = :courseid
-            AND uif.shortname = 'StudiesCode'";
+                AND uid.fieldid = (SELECT id FROM {user_info_field} WHERE shortname = 'StudiesCode')
+            WHERE e.courseid = :courseid";
 
 
     // Fetch students' StudiesCode for the course
