@@ -56,10 +56,16 @@ const setStudiesCodeForUserGradesTable = (nesanumbers, coursetype) => {
     // Create span with data-collapse content
     const spanElement = document.createElement('span');
     spanElement.setAttribute('data-collapse', 'content');
+    console.log('Course type in setStudiesCodeForUserGradesTable:');
+    console.log(typeof coursetype);
+    let isIB = false;
+    let isHSC = false;
     if (coursetype === 'IB') {
         spanElement.textContent = 'IB Personal Code';
+        isIB = true;
     } else {
         spanElement.textContent = 'Studies Code';
+        isHSC = true;
     }
 
     // Create button element
@@ -82,9 +88,17 @@ const setStudiesCodeForUserGradesTable = (nesanumbers, coursetype) => {
     const tbodyRows = table.querySelectorAll('tbody tr');
     tbodyRows.forEach((row) => {
         const userid = row.getAttribute('data-uid');
-        const studiescode = nesanumbers[userid]?.studies_code !== undefined
-            ? nesanumbers[userid].studies_code
-            : 'N/A';
+
+        if(isHSC) {
+            var studiescode = nesanumbers[userid]?.studies_code !== undefined
+                ? nesanumbers[userid].studies_code
+                : 'N/A';
+        } else if(isIB) {
+            var studiescode = nesanumbers[userid]?.ib_code !== undefined
+                ? nesanumbers[userid].ib_code
+                : 'N/A';
+        }
+
 
         // Create the new studies code cell with a div inside.
         const nesaCell = document.createElement('td');
@@ -276,10 +290,14 @@ const setStudiesCodeForSubmissionsTable = (nesanumbers, coursetype) => {
     // Create clickable link for sorting
     const sortLink = document.createElement('a');
     sortLink.href = '#';
+    let isIB = false;
+    let isHSC = false;
     if (coursetype === 'IB') {
         sortLink.textContent = 'IB Personal Code';
+        isIB = true;
     } else {
         sortLink.textContent = 'Studies Code';
+        isHSC = true;
     }
     sortLink.title = 'Click to sort by Studies Code';
     sortLink.style.textDecoration = 'none';
@@ -319,9 +337,16 @@ const setStudiesCodeForSubmissionsTable = (nesanumbers, coursetype) => {
         const userClass = rowClasses.find(cls => cls.startsWith('user') && cls !== 'userrow');
         const userid = userClass ? userClass.replace('user', '') : null;
 
-        const studiescode = userid && nesanumbers[userid]?.studies_code
-            ? nesanumbers[userid].studies_code
-            : 'N/A';
+        if(isIB) {
+            var studiescode = userid && nesanumbers[userid]?.ib_code
+                ? nesanumbers[userid].ib_code
+                : 'N/A';
+            
+        } else if(isHSC) {
+            var studiescode = userid && nesanumbers[userid]?.studies_code
+                ? nesanumbers[userid].studies_code
+                : 'N/A';
+        }
 
         // Create the new Studies Code cell
         const studiesCodeCell = document.createElement('td');
