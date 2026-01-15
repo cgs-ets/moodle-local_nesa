@@ -25,8 +25,9 @@
  * Add Studies Code column to the user grades table (gradebook).
  *
  * @param {Object} nesanumbers - Object mapping user IDs to their NESA data
+ * @param {string} coursetype - Type of course (IB or HSC)
  */
-const setStudiesCodeForUserGradesTable = (nesanumbers) => {
+const setStudiesCodeForUserGradesTable = (nesanumbers, coursetype) => {
     const table = document.getElementById('user-grades');
 
     if (!table) {
@@ -55,7 +56,11 @@ const setStudiesCodeForUserGradesTable = (nesanumbers) => {
     // Create span with data-collapse content
     const spanElement = document.createElement('span');
     spanElement.setAttribute('data-collapse', 'content');
-    spanElement.textContent = 'Studies Code';
+    if (coursetype === 'IB') {
+        spanElement.textContent = 'IB Personal Code';
+    } else {
+        spanElement.textContent = 'Studies Code';
+    }
 
     // Create button element
     const buttonElement = document.createElement('button');
@@ -224,7 +229,8 @@ const isShowingAll = () => {
 const redirectToShowAllAndSort = () => {
     const url = new URL(window.location.href);
     url.searchParams.set('perpage', '-1');
-    url.searchParams.set('sortbystudiescode', '1'); // Marker to trigger sort after page load
+    // Use sessionStorage to preserve sort intent across redirect (more reliable than URL params)
+    sessionStorage.setItem('sortbystudiescode', '1');
     window.location.href = url.toString();
 };
 
@@ -232,8 +238,9 @@ const redirectToShowAllAndSort = () => {
  * Add Studies Code column to the submissions table (mod/assign grading view).
  *
  * @param {Object} nesanumbers - Object mapping user IDs to their NESA data
+ * @param {string} coursetype - Type of course (IB or HSC)
  */
-const setStudiesCodeForSubmissionsTable = (nesanumbers) => {
+const setStudiesCodeForSubmissionsTable = (nesanumbers, coursetype) => {
     const table = document.getElementById('submissions');
 
     if (!table) {
@@ -269,7 +276,11 @@ const setStudiesCodeForSubmissionsTable = (nesanumbers) => {
     // Create clickable link for sorting
     const sortLink = document.createElement('a');
     sortLink.href = '#';
-    sortLink.textContent = 'Studies Code';
+    if (coursetype === 'IB') {
+        sortLink.textContent = 'IB Personal Code';
+    } else {
+        sortLink.textContent = 'Studies Code';
+    }
     sortLink.title = 'Click to sort by Studies Code';
     sortLink.style.textDecoration = 'none';
     sortLink.style.color = 'inherit';
@@ -354,11 +365,9 @@ const setStudiesCodeForSubmissionsTable = (nesanumbers) => {
     });
 
     // Check if we should auto-sort (redirected from pagination)
-    const url = new URL(window.location.href);
-    if (url.searchParams.get('sortbystudiescode') === '1') {
-        // Remove the marker from URL (clean up)
-        url.searchParams.delete('sortbystudiescode');
-        window.history.replaceState({}, '', url.toString());
+    if (sessionStorage.getItem('sortbystudiescode') === '1') {
+        // Remove the marker from sessionStorage (clean up)
+        sessionStorage.removeItem('sortbystudiescode');
 
         // Trigger sort
         sortTableByStudiesCode(table);
@@ -370,17 +379,19 @@ const setStudiesCodeForSubmissionsTable = (nesanumbers) => {
  * Initialize the module.
  *
  * @param {string} nesanumbers - JSON string of NESA numbers data
+ * @param {string} coursetype - Type of course (IB or HSC)
  */
-export const init = (nesanumbers) => {
+export const init = (nesanumbers, coursetype) => {
     const parsedNesaNumbers = JSON.parse(nesanumbers);
 
+    console.log('Initializing NESA control module with data:', parsedNesaNumbers, 'and course type:', coursetype);
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
-            setStudiesCodeForUserGradesTable(parsedNesaNumbers);
-            setStudiesCodeForSubmissionsTable(parsedNesaNumbers);
+            setStudiesCodeForUserGradesTable(parsedNesaNumbers, coursetype);
+            setStudiesCodeForSubmissionsTable(parsedNesaNumbers, coursetype);
         });
     } else {
-        setStudiesCodeForUserGradesTable(parsedNesaNumbers);
-        setStudiesCodeForSubmissionsTable(parsedNesaNumbers);
+        setStudiesCodeForUserGradesTable(parsedNesaNumbers, coursetype);
+        setStudiesCodeForSubmissionsTable(parsedNesaNumbers, coursetype);
     }
 };
